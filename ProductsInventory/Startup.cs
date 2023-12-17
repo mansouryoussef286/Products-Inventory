@@ -61,6 +61,12 @@ namespace ProductsInventory
                 //var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
                 //c.IncludeXmlComments(xmlPath);
             });
+
+            // Firebase Realtime Database Configuration
+            var firebaseUrl = Configuration["Firebase:DatabaseUrl"];
+            var firebaseSecret = Configuration["Firebase:DatabaseSecret"];
+            services.AddSingleton<IRealTimeService>(provider =>
+        new RealTimeService(firebaseUrl, firebaseSecret));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

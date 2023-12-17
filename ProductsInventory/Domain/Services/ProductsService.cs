@@ -14,11 +14,13 @@ namespace ProductsInventory.Domain
     {
         private readonly IProductsRepository _productsRepository;
         private readonly IAuditService _auditService;
+        private readonly IRealTimeService _realTimeService;
 
-        public ProductsService(IProductsRepository productRepository,IAuditService auditService)
+        public ProductsService(IProductsRepository productRepository, IAuditService auditService, IRealTimeService realTimeService)
         {
             _productsRepository = productRepository;
             _auditService = auditService;
+            _realTimeService = realTimeService;
         }
 
         public List<ProductDTO> GetProducts()
@@ -46,6 +48,7 @@ namespace ProductsInventory.Domain
             {
                 var oldProduct = GetProductById(product.ProductId);
                 await _auditService.AuditProduct(oldProduct, product, OperationTypeEnum.Update);
+                _realTimeService.PushAuditLog(oldProduct, product, OperationTypeEnum.Update);
                 return true;
             }
             return false;

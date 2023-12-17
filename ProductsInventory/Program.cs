@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +15,12 @@ namespace ProductsInventory
     {
         public static void Main(string[] args)
         {
+            var credentialsPath = "appsettings.firebase.json";
+            var credential = GoogleCredential.FromFile(credentialsPath);
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = credential,
+            });
             CreateHostBuilder(args).Build().Run();
         }
 
