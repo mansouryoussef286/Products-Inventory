@@ -11,7 +11,7 @@
   <p align="center">
     Basic Inventory system for products management
     <br />
-    <a href="https://github.com/mansouryoussef286/ProductsInventory"><strong>Explore the code »</strong></a>
+    <a href="https://github.com/mansouryoussef286/Products-Inventory/tree/master/ProductsInventory"><strong>Explore the code »</strong></a>
     <br />
   </p>
 </div>
