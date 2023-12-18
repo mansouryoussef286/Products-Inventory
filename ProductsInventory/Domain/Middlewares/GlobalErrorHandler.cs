@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductsInventory.Domain.Middlewares
 {
     public enum ErrorType
     {
         GeneralError,
-        NotFound,
-        // Add more error types as needed
+        DatabaseError,
     }
 
     public class ExceptionMiddleware
@@ -32,42 +32,37 @@ namespace ProductsInventory.Domain.Middlewares
             }
             catch (Exception ex)
             {
-                //await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex);
             }
         }
 
-        //private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-        //{
-        //    var code = HttpStatusCode.InternalServerError; // Default to 500 if unexpected
+        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            var code = HttpStatusCode.InternalServerError;
 
-            // Map exceptions to specific error types
-            //var errorType = MapErrorType(exception);
+            var errorType = MapErrorType(exception);
 
-            //switch (errorType)
-            //{
-            //    case ErrorType.NotFound:
-            //        code = HttpStatusCode.NotFound;
-            //        break;
-            //    // Add more cases for other error types
-            //    default:
-            //        break;
-            //}
+            switch (errorType)
+            {
+                case ErrorType.DatabaseError:
+                    code = HttpStatusCode.NotFound;
+                    break;
+                default:
+                    break;
+            }
 
-            //var result = JsonConvert.SerializeObject(new { error = errorType.ToString(), message = exception.Message });
-            //context.Response.ContentType = "application/json";
-            //context.Response.StatusCode = (int)code;
-            //return context.Response.WriteAsync(result);
-        //}
+            var result = JsonConvert.SerializeObject(new { error = errorType.ToString(), message = exception.Message });
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)code;
+            return context.Response.WriteAsync(result);
+        }
 
-        //private static ErrorType MapErrorType(Exception exception)
-        //{
-        //    // Map specific exceptions to error types
-        //    if (exception is NotFoundException) return ErrorType.NotFound;
-        //    // Add more mappings as needed
+        private static ErrorType MapErrorType(Exception exception)
+        {
+            if (exception is DbUpdateException dbUpdateException) return ErrorType.DatabaseError;
 
-        //    // Default to GeneralError
-        //    return ErrorType.GeneralError;
-        //}
+            return ErrorType.GeneralError;
+        }
     }
 
 }
